@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+    ConflictException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { CreateCityDto } from './dto/create-city.dto';
 import { UpdateCityDto } from './dto/update-city.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,23 +16,46 @@ export class CityService {
         private cityRepository: Repository<City>,
     ) {}
 
-    create(createCityDto: CreateCityDto) {
-        return 'This action adds a new city';
+    async create(createCityDto: CreateCityDto) {
+        const existCity = await this.cityRepository.findOneBy({
+            name: createCityDto.name,
+        });
+
+        if (existCity)
+            throw new ConflictException(
+                `City ${createCityDto.name} alredy exists`,
+            );
+        return await this.cityRepository.save(createCityDto);
     }
 
-    findAll() {
-        return `This action returns all city`;
+    async findAll() {
+        return await this.cityRepository.find();
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} city`;
+    async findOne(id: number) {
+        const city = await this.cityRepository.findOneBy({ id });
+        if (!city) throw new NotFoundException();
+        return city;
     }
 
-    update(id: number, updateCityDto: UpdateCityDto) {
-        return `This action updates a #${id} city`;
+    async update(id: number, updateCityDto: UpdateCityDto) {
+        const existCity = await this.cityRepository.findOneBy({
+            name: updateCityDto.name,
+        });
+        if (existCity)
+            throw new ConflictException(
+                `City ${updateCityDto.name} alredy exists`,
+            );
+        const city = await this.cityRepository.findOneBy({ id });
+        if (!city) throw new NotFoundException();
+        await this.cityRepository.update(id, updateCityDto);
+        return await this.cityRepository.findOneBy({ id });
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} city`;
+    async remove(id: number) {
+        const city = await this.cityRepository.findOneBy({ id });
+        if (!city) throw new NotFoundException();
+        await this.cityRepository.delete(id);
+        return city;
     }
 }
