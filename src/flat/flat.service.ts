@@ -1,9 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFlatDto } from './dto/create-flat.dto';
 import { UpdateFlatDto } from './dto/update-flat.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Flat } from './entities/flat.entity';
 
 @Injectable()
 export class FlatService {
+    constructor(
+        @InjectRepository(Flat)
+        private flatRepository: Repository<Flat>,
+    ) {}
+
     create(createFlatDto: CreateFlatDto) {
         return 'This action adds a new flat';
     }

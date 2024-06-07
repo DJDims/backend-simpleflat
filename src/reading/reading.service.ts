@@ -1,9 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { CreateReadingDto } from './dto/create-reading.dto';
 import { UpdateReadingDto } from './dto/update-reading.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Reading } from './entities/reading.entity';
 
 @Injectable()
 export class ReadingService {
+    constructor(
+        @InjectRepository(Reading)
+        private readingRepository: Repository<Reading>,
+    ) {}
+
     create(createReadingDto: CreateReadingDto) {
         return 'This action adds a new reading';
     }
