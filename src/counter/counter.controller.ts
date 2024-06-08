@@ -29,18 +29,25 @@ export class CounterController {
 
     @Get()
     @ApiOperation({ summary: 'Find all counters' })
+    @ApiResponse({ status: 200, description: 'OK' })
     findAll() {
         return this.counterService.findAll();
     }
 
     @Get(':id')
     @ApiOperation({ summary: 'Find counter by id' })
+    @ApiResponse({ status: 200, description: 'OK' })
+    @ApiResponse({ status: 404, description: 'Not found' })
     findOne(@Param('id') id: string) {
         return this.counterService.findOne(+id);
     }
 
     @Patch(':id')
     @ApiOperation({ summary: 'Update counter' })
+    @ApiResponse({ status: 200, description: 'OK' })
+    @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 404, description: 'Not found' })
+    @ApiResponse({ status: 409, description: 'Conflict' })
     update(
         @Param('id') id: string,
         @Body() updateCounterDto: UpdateCounterDto,
@@ -50,6 +57,8 @@ export class CounterController {
 
     @Delete(':id')
     @ApiOperation({ summary: 'Delete counter' })
+    @ApiResponse({ status: 200, description: 'OK' })
+    @ApiResponse({ status: 404, description: 'Not found' })
     remove(@Param('id') id: string) {
         return this.counterService.remove(+id);
     }
