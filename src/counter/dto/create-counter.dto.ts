@@ -1,8 +1,15 @@
-import { IsNumber, IsString } from '@nestjs/class-validator';
+import {
+    IsInt,
+    IsNotEmpty,
+    IsNumber,
+    IsPositive,
+    IsString,
+} from '@nestjs/class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCounterDto {
     @IsString()
+    @IsNotEmpty()
     @ApiProperty({
         description: 'Counter name',
         type: String,
@@ -11,9 +18,12 @@ export class CreateCounterDto {
     })
     name: string;
 
+    @IsNotEmpty()
     @IsNumber()
+    @IsInt()
+    @IsPositive()
     @ApiProperty({
-        description: 'ID of the apartment where this meter is located',
+        description: 'ID of the apartment where this counter is located',
         type: Number,
         required: true,
         default: 1,

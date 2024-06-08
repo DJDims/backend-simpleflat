@@ -10,7 +10,7 @@ import {
 import { CounterService } from './counter.service';
 import { CreateCounterDto } from './dto/create-counter.dto';
 import { UpdateCounterDto } from './dto/update-counter.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('counters')
 @ApiTags('Counters')
@@ -19,6 +19,10 @@ export class CounterController {
 
     @Post()
     @ApiOperation({ summary: 'Create new counter' })
+    @ApiResponse({ status: 201, description: 'Created' })
+    @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 404, description: 'Not found' })
+    @ApiResponse({ status: 409, description: 'Conflict' })
     create(@Body() createCounterDto: CreateCounterDto) {
         return this.counterService.create(createCounterDto);
     }
