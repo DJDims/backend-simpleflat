@@ -35,7 +35,7 @@ export class Flat {
     counters: Counter[];
 
     @Column()
-    flat: number;
+    flatNumber: number;
 
     @Column({
         type: 'enum',
