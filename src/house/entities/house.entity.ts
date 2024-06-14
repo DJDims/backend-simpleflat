@@ -8,7 +8,6 @@ import {
     JoinColumn,
     ManyToOne,
     OneToMany,
-    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -28,12 +27,12 @@ export class House {
     street: string;
 
     @Column()
-    house: number;
+    houseNumber: number;
 
     @Column()
     zip: number;
 
-    @OneToOne(() => User, (user) => user.house)
+    @ManyToOne(() => User, (user) => user.houses)
     @JoinColumn({ name: 'ownerId' })
     owner: User;
 

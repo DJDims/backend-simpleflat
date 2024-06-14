@@ -4,8 +4,8 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    ManyToOne,
     OneToMany,
-    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -33,8 +33,8 @@ export class User {
     @Column()
     password: string;
 
-    @OneToOne(() => House, (house) => house.owner)
-    house: House;
+    @OneToMany(() => House, (house) => house.owner)
+    houses: House[];
 
     @OneToMany(() => Flat, (flat) => flat.user)
     flat: Flat[];
