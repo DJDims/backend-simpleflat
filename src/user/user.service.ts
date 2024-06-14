@@ -1,9 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import {
+    ConflictException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import * as ag2 from 'argon2';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -12,23 +18,45 @@ export class UserService {
         private userRepository: Repository<User>,
     ) {}
 
-    create(createUserDto: CreateUserDto) {
-        return 'This action adds a new user';
+    async create(createUserDto: CreateUserDto) {
+        const existUser = await this.userRepository.findOneBy({
+            email: createUserDto.email,
+        });
+        if (existUser)
+            throw new ConflictException(
+                `Email ${createUserDto.email} already taken`,
+            );
+        const user = this.userRepository.create(createUserDto);
+        user.password = await ag2.hash(createUserDto.password);
+        user.token = await uuidv4();
+        return this.userRepository.save(user);
     }
 
-    findAll() {
-        return `This action returns all user`;
+    async findAll() {
+        return await this.userRepository.find();
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} user`;
+    async findOne(id: number) {
+        const user = await this.userRepository.findOneBy({ id });
+        if (!user) throw new NotFoundException(`User with id ${id} not found`);
+        return user;
     }
 
-    update(id: number, updateUserDto: UpdateUserDto) {
-        return `This action updates a #${id} user`;
+    async update(id: number, updateUserDto: UpdateUserDto) {
+        const userExist = await this.userRepository.findOneBy({ id });
+        if (!userExist)
+            throw new NotFoundException(`User with id ${id} not found`);
+        await this.userRepository.update(id, {
+            firstname: updateUserDto.firstname,
+            lastname: updateUserDto.lastname,
+        });
+        return await this.userRepository.findOneBy({ id });
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} user`;
+    async remove(id: number) {
+        const user = await this.userRepository.findOneBy({ id });
+        if (!user) throw new NotFoundException(`User with id ${id} not found`);
+        await this.userRepository.delete(id);
+        return await this.userRepository.findOneBy({ id });
     }
 }

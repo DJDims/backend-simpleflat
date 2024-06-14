@@ -16,6 +16,11 @@ export enum Status {
     REJECTED = 'rejected',
 }
 
+export enum Role {
+    ADMIN = 'admin',
+    USER = 'user',
+}
+
 @Entity({ name: 'users' })
 export class User {
     @PrimaryGeneratedColumn()
@@ -45,6 +50,13 @@ export class User {
         default: Status.PENDING,
     })
     status: Status;
+
+    @Column({
+        type: 'enum',
+        enum: Role,
+        default: Role.USER,
+    })
+    role: Role;
 
     @Column()
     token: string;
