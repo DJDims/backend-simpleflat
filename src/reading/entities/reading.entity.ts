@@ -14,10 +14,10 @@ export class Reading {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column('decimal', { precision: 8, scale: 3 })
     value: number;
 
-    @ManyToOne(() => Counter, (counter) => counter.flat)
+    @ManyToOne(() => Counter, (counter) => counter.readings)
     @JoinColumn({ name: 'counterId' })
     counter: Counter;
 
