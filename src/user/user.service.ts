@@ -10,12 +10,14 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as ag2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
+        private readonly emailService: EmailService,
     ) {}
 
     async create(createUserDto: CreateUserDto) {
@@ -29,6 +31,7 @@ export class UserService {
         const user = this.userRepository.create(createUserDto);
         user.password = await ag2.hash(createUserDto.password);
         user.token = await uuidv4();
+        await this.emailService.sendUserConfirmation(user);
         return this.userRepository.save(user);
     }
 

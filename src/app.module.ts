@@ -6,8 +6,8 @@ import { HouseModule } from './house/house.module';
 import { CityModule } from './city/city.module';
 import { CounterModule } from './counter/counter.module';
 import { ReadingModule } from './reading/reading.module';
-import { MailerModule } from '@nestjs-modules/mailer';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EmailModule } from './email/email.module';
 
 @Module({
     imports: [
@@ -17,6 +17,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         CityModule,
         CounterModule,
         ReadingModule,
+        EmailModule,
         ConfigModule.forRoot({
             isGlobal: true,
         }),
@@ -33,15 +34,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
                 entities: [configService.get('TYPEORM_ENTITIES')],
             }),
             inject: [ConfigService],
-        }),
-        MailerModule.forRoot({
-            transport: {
-                host: '',
-                auth: {
-                    user: '',
-                    pass: '',
-                },
-            },
         }),
     ],
     controllers: [],
