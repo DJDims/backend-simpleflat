@@ -1,5 +1,6 @@
 import { Counter } from 'src/counter/entities/counter.entity';
 import { House } from 'src/house/entities/house.entity';
+import { EStatus } from 'src/types/types';
 import { User } from 'src/user/entities/user.entity';
 import {
     Column,
@@ -11,12 +12,6 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-
-export enum Status {
-    PENDING = 'pending',
-    ACCEPTED = 'accepted',
-    REJECTED = 'rejected',
-}
 
 @Entity({ name: 'flats' })
 export class Flat {
@@ -39,10 +34,10 @@ export class Flat {
 
     @Column({
         type: 'enum',
-        enum: Status,
-        default: Status.PENDING,
+        enum: EStatus,
+        default: EStatus.PENDING,
     })
-    status: Status;
+    status: EStatus;
 
     @CreateDateColumn()
     createdAt: Date;

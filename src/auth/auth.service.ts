@@ -1,8 +1,13 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+    ForbiddenException,
+    Injectable,
+    UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
+import { EStatus } from 'src/types/types';
 
 @Injectable()
 export class AuthService {
@@ -29,5 +34,13 @@ export class AuthService {
                 role: user.role,
             }),
         };
+    }
+
+    async verifyEmail(token: string) {
+        const user = await this.userService.findByToken(token);
+        if (user.status !== 'pending')
+            throw new ForbiddenException(`Email already verified`);
+        await this.userService.changeStatus(user, EStatus.ACCEPTED);
+        return true;
     }
 }

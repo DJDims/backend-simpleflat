@@ -1,25 +1,14 @@
 import { Flat } from 'src/flat/entities/flat.entity';
 import { House } from 'src/house/entities/house.entity';
+import { ERole, EStatus } from 'src/types/types';
 import {
     Column,
     CreateDateColumn,
     Entity,
-    ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-
-export enum Status {
-    PENDING = 'pending',
-    ACCEPTED = 'accepted',
-    REJECTED = 'rejected',
-}
-
-export enum Role {
-    ADMIN = 'admin',
-    USER = 'user',
-}
 
 @Entity({ name: 'users' })
 export class User {
@@ -46,17 +35,17 @@ export class User {
 
     @Column({
         type: 'enum',
-        enum: Status,
-        default: Status.PENDING,
+        enum: EStatus,
+        default: EStatus.PENDING,
     })
-    status: Status;
+    status: EStatus;
 
     @Column({
         type: 'enum',
-        enum: Role,
-        default: Role.USER,
+        enum: ERole,
+        default: ERole.USER,
     })
-    role: Role;
+    role: ERole;
 
     @Column()
     token: string;

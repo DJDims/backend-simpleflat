@@ -11,6 +11,7 @@ import { User } from './entities/user.entity';
 import * as ag2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 import { EmailService } from 'src/email/email.service';
+import { EStatus } from 'src/types/types';
 
 @Injectable()
 export class UserService {
@@ -52,6 +53,13 @@ export class UserService {
         return user;
     }
 
+    async findByToken(token: string) {
+        const user = await this.userRepository.findOneBy({ token });
+        if (!user)
+            throw new NotFoundException(`User with token ${token} not found`);
+        return user;
+    }
+
     async update(id: number, updateUserDto: UpdateUserDto) {
         const userExist = await this.userRepository.findOneBy({ id });
         if (!userExist)
@@ -61,6 +69,11 @@ export class UserService {
             lastname: updateUserDto.lastname,
         });
         return await this.userRepository.findOneBy({ id });
+    }
+
+    async changeStatus(user: User, status: EStatus) {
+        user.status = status;
+        return await this.userRepository.save(user);
     }
 
     async remove(id: number) {

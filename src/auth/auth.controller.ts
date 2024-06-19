@@ -2,6 +2,7 @@ import {
     Body,
     Controller,
     Get,
+    Param,
     Post,
     Request,
     UseGuards,
@@ -35,9 +36,17 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Get your profile' })
     @ApiBearerAuth()
-    @ApiResponse({ status: 200, description: 'Ok' })
+    @ApiResponse({ status: 200, description: 'OK' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     getProfile(@Request() req) {
         return req.user;
+    }
+
+    @Post('email/:token')
+    @ApiResponse({ status: 201, description: 'OK' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
+    @ApiResponse({ status: 404, description: 'Not found' })
+    async verifyEmail(@Param('token') token: string) {
+        return await this.authService.verifyEmail(token);
     }
 }
