@@ -19,6 +19,7 @@ export class UserController {
 
     @Post()
     @ApiOperation({ summary: 'Create new user' })
+    @ApiTags('Auth')
     @ApiResponse({ status: 201, description: 'Created' })
     @ApiResponse({ status: 400, description: 'Bad request' })
     @ApiResponse({ status: 409, description: 'Conflict' })

@@ -12,10 +12,10 @@ async function bootstrap() {
         .setTitle('ManualMaker list api')
         .setVersion('1.0')
         .addBearerAuth({
-            name: 'token',
+            name: 'Authorization',
             bearerFormat: 'JWT',
             scheme: 'bearer',
-            type: 'apiKey',
+            type: 'http',
             in: 'header',
         })
         .build();

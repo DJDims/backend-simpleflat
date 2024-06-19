@@ -8,6 +8,7 @@ import { CounterModule } from './counter/counter.module';
 import { ReadingModule } from './reading/reading.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmailModule } from './email/email.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
     imports: [
@@ -35,6 +36,7 @@ import { EmailModule } from './email/email.module';
             }),
             inject: [ConfigService],
         }),
+        AuthModule,
     ],
     controllers: [],
     providers: [],
