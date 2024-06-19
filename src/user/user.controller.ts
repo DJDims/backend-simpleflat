@@ -6,11 +6,18 @@ import {
     Patch,
     Param,
     Delete,
+    UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiOperation,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 
 @Controller('users')
 @ApiTags('Users')
@@ -43,17 +50,25 @@ export class UserController {
     }
 
     @Patch(':id')
+    @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Update user' })
+    @ApiBearerAuth()
     @ApiResponse({ status: 200, description: 'OK' })
     @ApiResponse({ status: 400, description: 'Bad request' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
     update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
         return this.userService.update(+id, updateUserDto);
     }
 
     @Delete(':id')
+    @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Delete user' })
+    @ApiBearerAuth()
     @ApiResponse({ status: 200, description: 'OK' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
     remove(@Param('id') id: string) {
         return this.userService.remove(+id);
