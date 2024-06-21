@@ -23,7 +23,7 @@ export class CityService {
 
         if (existCity)
             throw new ConflictException(
-                `City ${createCityDto.name} alredy exists`,
+                `City ${createCityDto.name} already exists`,
             );
         return await this.cityRepository.save(createCityDto);
     }
@@ -34,7 +34,7 @@ export class CityService {
 
     async findOne(id: number) {
         const city = await this.cityRepository.findOneBy({ id });
-        if (!city) throw new NotFoundException();
+        if (!city) throw new NotFoundException(`City with id ${id} not found`);
         return city;
     }
 
@@ -44,17 +44,16 @@ export class CityService {
         });
         if (existCity)
             throw new ConflictException(
-                `City ${updateCityDto.name} alredy exists`,
+                `City ${updateCityDto.name} already exists`,
             );
-        const city = await this.cityRepository.findOneBy({ id });
-        if (!city) throw new NotFoundException();
-        await this.cityRepository.update(id, updateCityDto);
+        const city = await this.findOne(id);
+        city.name = updateCityDto.name;
+        await this.cityRepository.update(id, city);
         return await this.cityRepository.findOneBy({ id });
     }
 
     async remove(id: number) {
-        const city = await this.cityRepository.findOneBy({ id });
-        if (!city) throw new NotFoundException();
+        const city = await this.findOne(id);
         await this.cityRepository.delete(id);
         return city;
     }

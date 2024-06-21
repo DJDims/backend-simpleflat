@@ -10,34 +10,32 @@ import { Repository } from 'typeorm';
 import { House } from './entities/house.entity';
 import { City } from 'src/city/entities/city.entity';
 import { User } from 'src/user/entities/user.entity';
+import { CityService } from 'src/city/city.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class HouseService {
     constructor(
         @InjectRepository(House)
         private houseRepository: Repository<House>,
-        @InjectRepository(City)
-        private cityRepository: Repository<City>,
-        @InjectRepository(User)
-        private userRepository: Repository<User>,
+        // @InjectRepository(City)
+        // private cityRepository: Repository<City>,
+        // @InjectRepository(User)
+        // private userRepository: Repository<User>,
+        private cityService: CityService,
+        private userService: UserService,
     ) {}
 
     async create(createHouseDto: CreateHouseDto) {
         const { cityId, ownerId, street, houseNumber } = createHouseDto;
-        const city = await this.cityRepository.findOneBy({
-            id: cityId,
-        });
-        if (!city)
-            throw new NotFoundException(`City with id ${cityId} not found`);
-        const owner = await this.userRepository.findOneBy({ id: ownerId });
-        if (!owner)
-            throw new NotFoundException(`User with id ${ownerId} not found`);
-        const houseExist = await this.houseRepository.findOneBy({
+        const city = await this.cityService.findOne(cityId);
+        const owner = await this.userService.findOne(ownerId);
+        const existHouseInCityOnStreet = await this.houseRepository.findOneBy({
             street: street,
             houseNumber: houseNumber,
             city: city,
         });
-        if (houseExist)
+        if (existHouseInCityOnStreet)
             throw new ConflictException(
                 `House with number ${houseNumber} on street ${street} in city ${city.name} alredy exist`,
             );
@@ -66,22 +64,18 @@ export class HouseService {
         });
         if (!existHouse)
             throw new NotFoundException(`House with id ${id} not found`);
-        const city = await this.cityRepository.findOneBy({
-            id: cityId || existHouse.city.id,
-        });
-        if (!city)
-            throw new NotFoundException(`City with id ${cityId} not found`);
-        const owner = await this.userRepository.findOneBy({
-            id: ownerId || existHouse.owner.id,
-        });
-        if (!owner)
-            throw new NotFoundException(`User with id ${ownerId} not found`);
-        const houseExist = await this.houseRepository.findOneBy({
+        const city = await this.cityService.findOne(
+            cityId || existHouse.city.id,
+        );
+        const owner = await this.userService.findOne(
+            ownerId || existHouse.owner.id,
+        );
+        const existHouseInCityOnStreet = await this.houseRepository.findOneBy({
             street: street,
             houseNumber: houseNumber,
             city: { id: cityId },
         });
-        if (houseExist)
+        if (existHouseInCityOnStreet)
             throw new ConflictException(
                 `House number ${houseNumber} on street ${street} in city ${city.name} alredy exist`,
             );
@@ -93,9 +87,7 @@ export class HouseService {
     }
 
     async remove(id: number) {
-        const house = await this.houseRepository.findOneBy({ id });
-        if (!house)
-            throw new NotFoundException(`House with id ${id} not found`);
+        const house = await this.findOne(id);
         await this.houseRepository.delete(id);
         return house;
     }

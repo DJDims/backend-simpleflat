@@ -9,23 +9,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Counter } from './entities/counter.entity';
 import { Flat } from 'src/flat/entities/flat.entity';
+import { FlatService } from 'src/flat/flat.service';
 
 @Injectable()
 export class CounterService {
     constructor(
         @InjectRepository(Counter)
         private counterRepository: Repository<Counter>,
-        @InjectRepository(Flat)
-        private flatRepository: Repository<Flat>,
+        // @InjectRepository(Flat)
+        // private flatRepository: Repository<Flat>,
+        private flatService: FlatService,
     ) {}
 
     async create(createCounterDto: CreateCounterDto) {
         const { name, flatId } = createCounterDto;
-        const flat = await this.flatRepository.findOneBy({
-            id: flatId,
-        });
-        if (!flat)
-            throw new NotFoundException(`Flat with id ${flatId} not exist`);
+        const flat = await this.flatService.findOne(flatId);
         const existCounter = await this.counterRepository.findOneBy({
             name,
             flat: { id: flatId },
@@ -45,7 +43,8 @@ export class CounterService {
 
     async findOne(id: number) {
         const counter = await this.counterRepository.findOneBy({ id });
-        if (!counter) throw new NotFoundException();
+        if (!counter)
+            throw new NotFoundException(`Counter with id ${id} not found`);
         return counter;
     }
 
@@ -57,11 +56,9 @@ export class CounterService {
         });
         if (!existCounter)
             throw new NotFoundException(`Counter with id ${id} not exist`);
-        const flat = await this.flatRepository.findOneBy({
-            id: flatId || existCounter.flat.id,
-        });
-        if (!flat)
-            throw new NotFoundException(`Flat with id ${flatId} not exist`);
+        const flat = await this.flatService.findOne(
+            flatId || existCounter.flat.id,
+        );
         const existCounterInFlat = await this.counterRepository.findOneBy({
             name: name || existCounter.name,
             flat: { id: flatId || existCounter.flat.id },
@@ -77,8 +74,7 @@ export class CounterService {
     }
 
     async remove(id: number) {
-        const counter = await this.counterRepository.findOneBy({ id });
-        if (!counter) throw new NotFoundException();
+        const counter = await this.findOne(id);
         await this.counterRepository.delete(id);
         return counter;
     }

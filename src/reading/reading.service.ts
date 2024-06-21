@@ -9,40 +9,27 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { Reading } from './entities/reading.entity';
 import { Counter } from 'src/counter/entities/counter.entity';
+import { CounterService } from 'src/counter/counter.service';
 
 @Injectable()
 export class ReadingService {
     constructor(
         @InjectRepository(Reading)
         private readingRepository: Repository<Reading>,
-        @InjectRepository(Counter)
-        private counterRepository: Repository<Counter>,
+        // @InjectRepository(Counter)
+        // private counterRepository: Repository<Counter>,
+        private counterService: CounterService,
     ) {}
 
     async create(createReadingDto: CreateReadingDto) {
-        const counter = await this.counterRepository.findOneBy({
-            id: createReadingDto.counterId,
-        });
-        if (!counter)
-            throw new NotFoundException(
-                `Counter with id ${createReadingDto.counterId} not found`,
-            );
-        const startOfMonth = new Date(
-            new Date().getFullYear(),
-            new Date().getMonth(),
-            1,
-        );
-        const endOfMonth = new Date(
-            new Date().getFullYear(),
-            new Date().getMonth() + 1,
-            0,
-        );
+        const { counterId } = createReadingDto;
+        const counter = await this.counterService.findOne(counterId);
+        const startOfMonth = this.getStartOfMonth();
+        const endOfMonth = this.getEndOfMonth();
         const month = this.getCurrentMonthName();
-        const readingExist = await this.readingRepository.findOne({
-            where: {
-                counter: { id: createReadingDto.counterId },
-                createdAt: Between(startOfMonth, endOfMonth),
-            },
+        const readingExist = await this.readingRepository.findOneBy({
+            counter: { id: counterId },
+            createdAt: Between(startOfMonth, endOfMonth),
         });
         if (readingExist)
             throw new ConflictException(
@@ -65,22 +52,27 @@ export class ReadingService {
     }
 
     async update(id: number, updateReadingDto: UpdateReadingDto) {
-        const reading = await this.readingRepository.findOneBy({ id });
-        if (!reading)
-            throw new NotFoundException(`Reading with id ${id} not found`);
+        const reading = await this.findOne(id);
         reading.value = updateReadingDto.value;
         await this.readingRepository.update(id, reading);
         return await this.readingRepository.findOneBy({ id });
     }
 
     async remove(id: number) {
-        const reading = await this.readingRepository.findOneBy({ id });
-        if (!reading) throw new NotFoundException();
+        const reading = await this.findOne(id);
         await this.readingRepository.delete(id);
         return reading;
     }
 
     private getCurrentMonthName(): string {
         return new Date().toLocaleString('ru-RU', { month: 'long' });
+    }
+
+    private getStartOfMonth(): Date {
+        return new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    }
+
+    private getEndOfMonth(): Date {
+        return new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
     }
 }

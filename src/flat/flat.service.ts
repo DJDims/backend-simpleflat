@@ -9,26 +9,26 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Flat } from './entities/flat.entity';
 import { House } from 'src/house/entities/house.entity';
+import { HouseService } from 'src/house/house.service';
 
 @Injectable()
 export class FlatService {
     constructor(
         @InjectRepository(Flat)
         private flatRepository: Repository<Flat>,
-        @InjectRepository(House)
-        private houseRepository: Repository<House>,
+        // @InjectRepository(House)
+        // private houseRepository: Repository<House>,
+        private houseService: HouseService,
     ) {}
 
     async create(createFlatDto: CreateFlatDto) {
         const { flatNumber, houseId } = createFlatDto;
-        const house = await this.houseRepository.findOneBy({ id: houseId });
-        if (!house)
-            throw new NotFoundException(`House with id ${houseId} not found`);
-        const flatExist = await this.flatRepository.findOneBy({
+        const house = await this.houseService.findOne(houseId);
+        const existFlat = await this.flatRepository.findOneBy({
             flatNumber: flatNumber,
             house: { id: houseId },
         });
-        if (flatExist)
+        if (existFlat)
             throw new ConflictException(
                 `Flat ${flatNumber} alredy exist in house with id ${houseId}`,
             );
@@ -53,16 +53,14 @@ export class FlatService {
             where: { id },
             relations: ['house'],
         });
-        const house = await this.houseRepository.findOneBy({
-            id: houseId || existFlat.house.id,
-        });
-        if (!house)
-            throw new NotFoundException(`House with id ${houseId} not found`);
-        const flatExist = await this.flatRepository.findOneBy({
+        const house = await this.houseService.findOne(
+            houseId || existFlat.house.id,
+        );
+        const existFlatInHouse = await this.flatRepository.findOneBy({
             flatNumber: flatNumber,
             house: { id: houseId },
         });
-        if (flatExist)
+        if (existFlatInHouse)
             throw new ConflictException(
                 `Flat ${flatNumber} alredy exist in house with id ${houseId || existFlat.house.id}`,
             );
@@ -73,8 +71,7 @@ export class FlatService {
     }
 
     async remove(id: number) {
-        const flat = await this.flatRepository.findOneBy({ id });
-        if (!flat) throw new NotFoundException(`Flat with id ${id} not exist`);
+        const flat = await this.findOne(id);
         await this.flatRepository.delete(flat);
         return flat;
     }
