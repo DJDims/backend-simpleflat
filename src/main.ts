@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -9,7 +10,7 @@ async function bootstrap() {
     app.enableCors();
     app.useGlobalPipes(new ValidationPipe());
     const swaggerConfig = new DocumentBuilder()
-        .setTitle('ManualMaker list api')
+        .setTitle('Simpleflat list api')
         .setVersion('1.0')
         .addBearerAuth({
             name: 'Authorization',
@@ -21,6 +22,8 @@ async function bootstrap() {
         .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('api/swagger', app, document);
-    await app.listen(3000);
+    const configService = app.get(ConfigService);
+    const port = configService.get<number>('PORT');
+    await app.listen(port);
 }
 bootstrap();
