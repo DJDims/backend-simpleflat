@@ -18,10 +18,6 @@ export class HouseService {
     constructor(
         @InjectRepository(House)
         private houseRepository: Repository<House>,
-        // @InjectRepository(City)
-        // private cityRepository: Repository<City>,
-        // @InjectRepository(User)
-        // private userRepository: Repository<User>,
         private cityService: CityService,
         private userService: UserService,
     ) {}

@@ -16,8 +16,6 @@ export class CounterService {
     constructor(
         @InjectRepository(Counter)
         private counterRepository: Repository<Counter>,
-        // @InjectRepository(Flat)
-        // private flatRepository: Repository<Flat>,
         private flatService: FlatService,
     ) {}
 

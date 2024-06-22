@@ -16,8 +16,6 @@ export class ReadingService {
     constructor(
         @InjectRepository(Reading)
         private readingRepository: Repository<Reading>,
-        // @InjectRepository(Counter)
-        // private counterRepository: Repository<Counter>,
         private counterService: CounterService,
     ) {}
 
