@@ -7,6 +7,7 @@ import {
     Param,
     Delete,
     UseGuards,
+    Request,
 } from '@nestjs/common';
 import { FlatService } from './flat.service';
 import { CreateFlatDto } from './dto/create-flat.dto';
@@ -34,8 +35,8 @@ export class FlatController {
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
     @ApiResponse({ status: 409, description: 'Conflict' })
-    create(@Body() createFlatDto: CreateFlatDto) {
-        return this.flatService.create(createFlatDto);
+    create(@Body() createFlatDto: CreateFlatDto, @Request() request) {
+        return this.flatService.create(createFlatDto, request.user.id);
     }
 
     @Get()

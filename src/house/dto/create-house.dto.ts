@@ -47,18 +47,6 @@ export class CreateHouseDto {
     @IsPositive()
     @IsNotEmpty()
     @ApiProperty({
-        description: 'The ID of the user who will manage the house',
-        type: Number,
-        required: true,
-        default: 1,
-    })
-    ownerId: number;
-
-    @IsNumber()
-    @IsInt()
-    @IsPositive()
-    @IsNotEmpty()
-    @ApiProperty({
         description: 'Id of the city where the house is located',
         type: Number,
         required: true,

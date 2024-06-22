@@ -26,8 +26,8 @@ export class HouseService {
         private userService: UserService,
     ) {}
 
-    async create(createHouseDto: CreateHouseDto) {
-        const { cityId, ownerId, street, houseNumber } = createHouseDto;
+    async create(createHouseDto: CreateHouseDto, ownerId: number) {
+        const { cityId, street, houseNumber } = createHouseDto;
         const city = await this.cityService.findOne(cityId);
         const owner = await this.userService.findOne(ownerId);
         const existHouseInCityOnStreet = await this.houseRepository.findOneBy({

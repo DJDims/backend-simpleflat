@@ -25,18 +25,6 @@ export class UpdateFlatDto extends PartialType(CreateFlatDto) {
     @IsPositive()
     @IsInt()
     @ApiProperty({
-        description: 'The user ID of the person who lives in this flat',
-        type: Number,
-        required: true,
-        default: 1,
-    })
-    userId: number;
-
-    @IsNotEmpty()
-    @IsNumber()
-    @IsPositive()
-    @IsInt()
-    @ApiProperty({
         description: 'The ID of the house in which this flat is located',
         type: Number,
         required: true,

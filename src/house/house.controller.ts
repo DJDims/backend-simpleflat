@@ -7,6 +7,7 @@ import {
     Param,
     Delete,
     UseGuards,
+    Request,
 } from '@nestjs/common';
 import { HouseService } from './house.service';
 import { CreateHouseDto } from './dto/create-house.dto';
@@ -34,8 +35,8 @@ export class HouseController {
     @ApiResponse({ status: 403, description: 'Forbidden' })
     @ApiResponse({ status: 404, description: 'Not found' })
     @ApiResponse({ status: 409, description: 'Conflict' })
-    create(@Body() createHouseDto: CreateHouseDto) {
-        return this.houseService.create(createHouseDto);
+    create(@Body() createHouseDto: CreateHouseDto, @Request() request) {
+        return this.houseService.create(createHouseDto, request.user.id);
     }
 
     @Get()

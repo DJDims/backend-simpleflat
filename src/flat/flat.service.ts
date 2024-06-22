@@ -10,20 +10,21 @@ import { Repository } from 'typeorm';
 import { Flat } from './entities/flat.entity';
 import { House } from 'src/house/entities/house.entity';
 import { HouseService } from 'src/house/house.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class FlatService {
     constructor(
         @InjectRepository(Flat)
         private flatRepository: Repository<Flat>,
-        // @InjectRepository(House)
-        // private houseRepository: Repository<House>,
         private houseService: HouseService,
+        private userService: UserService,
     ) {}
 
-    async create(createFlatDto: CreateFlatDto) {
+    async create(createFlatDto: CreateFlatDto, userId: number) {
         const { flatNumber, houseId } = createFlatDto;
         const house = await this.houseService.findOne(houseId);
+        const user = await this.userService.findOne(userId);
         const existFlat = await this.flatRepository.findOneBy({
             flatNumber: flatNumber,
             house: { id: houseId },
@@ -34,6 +35,7 @@ export class FlatService {
             );
         const flat = this.flatRepository.create(createFlatDto);
         flat.house = house;
+        flat.user = user;
         return this.flatRepository.save(flat);
     }
 
