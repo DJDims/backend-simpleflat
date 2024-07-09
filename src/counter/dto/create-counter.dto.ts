@@ -29,4 +29,13 @@ export class CreateCounterDto {
         default: 1,
     })
     flatId: number;
+
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty({
+        description: 'Counter type: hot_water | cold_water | gas',
+        type: String,
+        required: true,
+    })
+    counterType: string;
 }

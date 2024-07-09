@@ -17,3 +17,9 @@ export enum ERole {
     ADMIN = 'admin',
     USER = 'user',
 }
+
+export enum ECounterType {
+    COLDWATER = 'cold_water',
+    HOTWATER = 'hot_water',
+    GAS = 'gas',
+}

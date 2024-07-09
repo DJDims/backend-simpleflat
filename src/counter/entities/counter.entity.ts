@@ -1,5 +1,6 @@
 import { Flat } from 'src/flat/entities/flat.entity';
 import { Reading } from 'src/reading/entities/reading.entity';
+import { ECounterType } from 'src/types/types';
 import {
     Column,
     CreateDateColumn,
@@ -25,6 +26,12 @@ export class Counter {
 
     @OneToMany(() => Reading, (reading) => reading.counter)
     readings: Reading[];
+
+    @Column({
+        type: 'enum',
+        enum: ECounterType,
+    })
+    counterType: ECounterType;
 
     @CreateDateColumn()
     createdAt: Date;
