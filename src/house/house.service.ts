@@ -29,7 +29,9 @@ export class HouseService {
         const existHouseInCityOnStreet = await this.houseRepository.findOneBy({
             street: street,
             houseNumber: houseNumber,
-            city: city,
+            city: {
+                id: city.id,
+            },
         });
         if (existHouseInCityOnStreet)
             throw new ConflictException(
